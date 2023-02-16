@@ -1,0 +1,44 @@
+{
+  "name": "bounce-ddd",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": ">=16.0.0 <19.0.0",
+    "npm": ">=8.0.0"
+  },
+  "engineStrict": true,
+  "scripts": {
+    "version": "npx tsc -v",
+    "start": "export DEBUG=* && npx tsc && node ./dist/app.js",
+    "debug": "export DEBUG=* && npm start",
+    "test": "npx jest",
+    "test:debug": "export DEBUG=* && node --inspect-brk node_modules/.bin/jest --runInBand",
+    "dev": "export DEBUG=* && node --inspect --require source-map-support/register -r ts-node/register app.ts"
+  },
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "debug": "^4.2.0",
+    "express": "^4.17.1",
+    "express-winston": "^4.0.5",
+    "shortid": "^2.2.16",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.7",
+    "@types/debug": "^4.1.5",
+    "@types/express": "^4.17.2",
+    "@types/jest": "^29.4.0",
+    "@types/shortid": "0.0.29",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.4.3",
+    "source-map-support": "^0.5.16",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.0.5",
+    "tslint": "^6.0.0",
+    "typescript": "^4.9.5",
+    "ts-node": "^10.9.1"
+  }
+}
