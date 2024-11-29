@@ -1,10 +1,12 @@
+import { UserRole } from './user';
+
 export class User {
     id: string;
     email: string;
     password: string;
     firstName?: string;
     lastName?: string;
-    permissionLevel?: number;
+    permissionLevel: UserRole;
 
     constructor(
         id: string,
@@ -12,7 +14,7 @@ export class User {
         password: string,
         firstName?: string,
         lastName?: string,
-        permissionLevel: number
+        permissionLevel: UserRole = UserRole.USER
     ) {
         this.id = id;
         this.email = email;

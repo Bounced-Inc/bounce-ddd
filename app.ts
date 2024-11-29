@@ -27,6 +27,14 @@ app.use(expressWinston.logger({
     )
 }));
 
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ error: 'No authorization header' });
+    }
+    next();
+});
+
 routes.push(new UsersRoutes(app));
 
 app.use(expressWinston.errorLogger({
