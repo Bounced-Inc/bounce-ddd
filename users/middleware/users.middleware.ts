@@ -1,6 +1,7 @@
 import express from 'express';
 import userService from '../services/users.service';
 import debug from 'debug';
+import { UnauthorizedError, ForbiddenError } from '../../common/errors/errors';
 
 const debugLog: debug.IDebugger = debug('app:users-middleware');
 class UsersMiddleware {
@@ -39,14 +40,19 @@ class UsersMiddleware {
     }
 
     async validateUserExists(req: express.Request, res: express.Response, next: express.NextFunction) {
-        debugLog(`Checking if user exists with ID: ${req.params.userId}`);
-        const user = await userService.readById(req.params.userId);
-        if (user) {
-            debugLog('User found');
+        try {
+            debugLog(`Checking if user exists with ID: ${req.params.userId}`);
+            const callingUserId = req.headers.authorization?.split(' ')[1];
+            if (!callingUserId) {
+                throw new UnauthorizedError('No authorization token');
+            }
             next();
-        } else {
-            debugLog('User not found');
-            res.status(404).send({error: `User ${req.params.userId} not found`});
+        } catch (error) {
+            if (error instanceof UnauthorizedError) {
+                res.status(401).send({ error: error.message });
+            } else {
+                res.status(500).send({ error: 'Internal server error' });
+            }
         }
     }
 

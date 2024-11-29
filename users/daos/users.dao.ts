@@ -61,13 +61,13 @@ class UsersDao {
     }
 
     async patchUserById(userId: string, user: Partial<UserDto>) {
-        console.log(`Attempting to patch user with ID: ${userId}`);
-        console.log('Patch data received:', JSON.stringify(user, null, 2));
+        log(`Attempting to patch user with ID: ${userId}`);
+        log('Patch data received: %O', user);
 
-        console.log('Updating user fields...');
+        log('Updating user fields...');
         this.users = this.users.map((existingUser, _index) => {
             if (existingUser.id === userId) {
-                console.log('Found matching user:', existingUser);
+                log('Found matching user: %O', existingUser);
                 const updatedUser = {
                     ...existingUser,
                     email: user.email ?? existingUser.email,
@@ -76,7 +76,7 @@ class UsersDao {
                     lastName: user.lastName ?? existingUser.lastName,
                     permissionLevel: user.permissionLevel ?? existingUser.permissionLevel
                 };
-                console.log('Updated user data:', updatedUser);
+                log('Updated user data: %O', updatedUser);
                 return updatedUser;
             }
             return existingUser;
@@ -84,9 +84,9 @@ class UsersDao {
 
         const patchedUser = this.users.find(user => user.id === userId);
         if (patchedUser) {
-            console.log('Successfully patched user');
+            log('Successfully patched user');
         } else {
-            console.warn('User not found after patch operation');
+            log('User not found after patch operation');
         }
         return patchedUser;
     }

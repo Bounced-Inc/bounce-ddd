@@ -23,6 +23,7 @@ export class UserConverter {
             dto.permissionLevel
         );
     }
+    // public static toPatchModel(dto: Partial<UserDto>): Required<Pick<User, 'permissionLevel'>> & Partial<User> {
     public static toPatchModel(dto: Partial<UserDto>): Partial<User> {
         return {
             ...(dto.email && { email: dto.email }),

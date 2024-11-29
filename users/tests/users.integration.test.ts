@@ -103,6 +103,34 @@ describe('User API Integration Tests', () => {
                 .set('Authorization', `Bearer ${adminUser.token}`);
             expect(response.status).toBe(404);
         });
+
+        it('should allow users to access their own data', async () => {
+            const response = await request(app)
+                .get(`/users/${regularUser.id}`)
+                .set('Authorization', `Bearer ${regularUser.token}`);
+            expect(response.status).toBe(200);
+            expect(response.body.email).toBe(regularUser.email);
+        });
+
+        it('should prevent users from accessing other users data', async () => {
+            const response = await request(app)
+                .get(`/users/${adminUser.id}`)
+                .set('Authorization', `Bearer ${regularUser.token}`);
+            expect(response.status).toBe(403);
+        });
+
+        it('should allow guest users to access only their own data', async () => {
+            const ownDataResponse = await request(app)
+                .get(`/users/${guestUser.id}`)
+                .set('Authorization', `Bearer ${guestUser.token}`);
+            expect(ownDataResponse.status).toBe(200);
+            expect(ownDataResponse.body.email).toBe(guestUser.email);
+
+            const otherDataResponse = await request(app)
+                .get(`/users/${regularUser.id}`)
+                .set('Authorization', `Bearer ${guestUser.token}`);
+            expect(otherDataResponse.status).toBe(403);
+        });
     });
 
     describe('POST /users', () => {
@@ -163,11 +191,9 @@ describe('User API Integration Tests', () => {
                 .set('Authorization', `Bearer ${adminUser.token}`)
                 .send(newUser);
 
-            // Verify user was created successfully
             expect(createResponse.status).toBe(201);
             expect(createResponse.body.id).toBeDefined();
 
-            // Verify user exists before deletion
             const getUserResponse = await request(app)
                 .get(`/users/${createResponse.body.id}`)
                 .set('Authorization', `Bearer ${adminUser.token}`);
@@ -178,7 +204,6 @@ describe('User API Integration Tests', () => {
                 .set('Authorization', `Bearer ${adminUser.token}`);
             expect(deleteResponse.status).toBe(204);
 
-            // Verify user was actually deleted
             const getDeletedUserResponse = await request(app)
                 .get(`/users/${createResponse.body.id}`)
                 .set('Authorization', `Bearer ${adminUser.token}`);
@@ -211,6 +236,44 @@ describe('User API Integration Tests', () => {
             expect(updatedUser.body.email).toBe(originalUser.body.email);
             expect(updatedUser.body.permissionLevel).toBe(originalUser.body.permissionLevel);
         });
+
+        it('users can update their own data', async () => {
+            const update = { firstName: 'UpdatedRegularUser' };
+            const response = await request(app)
+                .patch(`/users/${regularUser.id}`)
+                .set('Authorization', `Bearer ${regularUser.token}`)
+                .send(update);
+            expect(response.status).toBe(200);
+            expect(response.body.firstName).toBe('UpdatedRegularUser');
+        });
+
+        it('should prevent users from updating other users data', async () => {
+            const update = { firstName: 'Hacked' };
+            const response = await request(app)
+                .patch(`/users/${adminUser.id}`)
+                .set('Authorization', `Bearer ${regularUser.token}`)
+                .send(update);
+            expect(response.status).toBe(403);
+        });
+
+        it('should prevent non-admin users from updating permission levels', async () => {
+            const update = { permissionLevel: 'ADMIN' };
+            const response = await request(app)
+                .patch(`/users/${regularUser.id}`)
+                .set('Authorization', `Bearer ${regularUser.token}`)
+                .send(update);
+            expect(response.status).toBe(403);
+        });
+
+        it('should allow admin to update permission levels', async () => {
+            const update = { permissionLevel: 'USER' };
+            const response = await request(app)
+                .patch(`/users/${regularUser.id}`)
+                .set('Authorization', `Bearer ${adminUser.token}`)
+                .send(update);
+            expect(response.status).toBe(200);
+            expect(response.body.permissionLevel).toBe('USER');
+        });
     });
 
     describe('PUT /users/:userId', () => {
@@ -235,6 +298,61 @@ describe('User API Integration Tests', () => {
             
             expect(getResponse.status).toBe(200);
             expect(getResponse.body.firstName).toBe('Jane');
+        });
+
+        it('should prevent users from updating other users', async () => {
+            const update = {
+                email: 'hacked@example.com',
+                password: 'hacked123',
+                firstName: 'Hacked',
+                lastName: 'User',
+                permissionLevel: 'USER'
+            };
+
+            const response = await request(app)
+                .put(`/users/${adminUser.id}`)
+                .set('Authorization', `Bearer ${regularUser.token}`)
+                .send(update);
+            expect(response.status).toBe(403);
+        });
+
+        it('should prevent setting guest permission level', async () => {
+            const update = {
+                email: 'test@example.com',
+                password: 'test123',
+                firstName: 'Test',
+                lastName: 'User',
+                permissionLevel: 'GUEST'
+            };
+
+            const response = await request(app)
+                .put(`/users/${regularUser.id}`)
+                .set('Authorization', `Bearer ${adminUser.token}`)
+                .send(update);
+            expect(response.status).toBe(403);
+        });
+    });
+
+    describe('GET /users list filtering', () => {
+        it('get data for guest user', async () => {
+            const response = await request(app)
+                .get('/users')
+                .set('Authorization', `Bearer ${guestUser.token}`);
+            
+            expect(response.status).toBe(200);
+            expect(Array.isArray(response.body)).toBeTruthy();
+            expect(response.body.length).toBe(1);
+            expect(response.body[0].id).toBe(guestUser.id);
+        });
+
+        it('should return all users for admin users', async () => {
+            const response = await request(app)
+                .get('/users')
+                .set('Authorization', `Bearer ${adminUser.token}`);
+            
+            expect(response.status).toBe(200);
+            expect(Array.isArray(response.body)).toBeTruthy();
+            expect(response.body.length).toBeGreaterThan(1);
         });
     });
 });
