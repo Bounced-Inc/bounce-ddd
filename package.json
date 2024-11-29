@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=16.0.0 <19.0.0",
+    "npm": ">=8.0.0"
+  },
+  "engineStrict": true,
   "scripts": {
     "version": "npx tsc -v",
     "start": "export DEBUG=* && npx tsc && node ./dist/app.js",
