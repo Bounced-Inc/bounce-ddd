@@ -1,4 +1,4 @@
-import {UserDto, UserDtoPatch} from "../dto/user.dto";
+import {UserDto} from "../dto/user.dto";
 import shortid from "shortid";
 import debug from 'debug';
 import { UserRole } from "../models/user";
@@ -60,7 +60,7 @@ class UsersDao {
         return `${user.id} updated via put`;
     }
 
-    async patchUserById(userId: string, user: UserDtoPatch) {
+    async patchUserById(userId: string, user: Partial<UserDto>) {
         console.log(`Attempting to patch user with ID: ${userId}`);
         console.log('Patch data received:', JSON.stringify(user, null, 2));
 

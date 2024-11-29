@@ -1,6 +1,6 @@
 import UsersDao from '../daos/users.dao';
 import {CRUD} from "../../common/interfaces/crud.interface";
-import {UserDto, UserDtoPatch} from "../dto/user.dto";
+import {UserDto} from "../dto/user.dto";
 import { UserRole } from '../models/user';
 
 class UsersService implements CRUD<UserDto> {
@@ -16,7 +16,7 @@ class UsersService implements CRUD<UserDto> {
     async list(limit: number, page: number) {
         return UsersDao.getUsers();
     };
-    async patchById(resourceId: string, resource: UserDtoPatch) {
+    async patchById(resourceId: string, resource: Partial<UserDto>) {
         console.log(`[UsersService] Patching user with ID: ${resourceId}`);
         console.log('[UsersService] Patch data:', JSON.stringify(resource, null, 2));
         

@@ -1,5 +1,5 @@
 import { User } from '../models/users.model';
-import { UserDto, UserDtoPatch } from '../dto/user.dto';
+import { UserDto } from '../dto/user.dto';
 
 export class UserConverter {
     public static toDto(user: User): UserDto {
@@ -23,7 +23,7 @@ export class UserConverter {
             dto.permissionLevel
         );
     }
-    public static toPatchModel(dto: UserDtoPatch): Partial<User> {
+    public static toPatchModel(dto: Partial<UserDto>): Partial<User> {
         return {
             ...(dto.email && { email: dto.email }),
             ...(dto.password && { password: dto.password }),
