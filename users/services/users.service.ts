@@ -35,14 +35,16 @@ class UsersService implements CRUD<UserDto> {
         log('Listing users for caller:', callingUserId);
         
         const callingUser = await UsersDao.getUserById(callingUserId);
+        
         if (!callingUser) {
             throw new UnauthorizedError('Calling user not found');
         }
 
         if (callingUser.permissionLevel === UserRole.GUEST) {
             log('Guest user - returning only their own data');
-            const user = await UsersDao.getUserById(callingUserId);
-            return user ? [user] : [];
+            // const user = await UsersDao.getUserById(callingUserId);
+            // return user ? [user] : [];
+            throw new ForbiddenError('Guests are not allowed to list users');
         }
 
         return UsersDao.getUsers();
