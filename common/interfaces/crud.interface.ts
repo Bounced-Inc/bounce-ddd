@@ -1,8 +1,8 @@
-export interface CRUD {
-    list: (limit: number, page: number) => Promise<any>,
-    create: (resource: any) => Promise<any>,
-    updateById: (resourceId: any) => Promise<string>,
-    readById: (resourceId: any) => Promise<any>,
-    deleteById: (resourceId: any) => Promise<string>,
-    patchById: (resourceId: any) => Promise<string>,
+export interface CRUD<T> {
+    list: (limit: number, page: number, callingUserId: string) => Promise<T[]>;
+    create: (resource: Omit<T, 'id'>) => Promise<T>;
+    readById: (resourceId: string, callingUserId: string) => Promise<T>;
+    updateById: (resourceId: string, resource: T, callingUserId: string) => Promise<string>;
+    patchById: (resourceId: string, resource: Partial<T>, callingUserId: string) => Promise<T>;
+    deleteById: (resourceId: string, callingUserId: string) => Promise<string>;
 }
