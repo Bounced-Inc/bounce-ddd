@@ -8,6 +8,7 @@
     "start": "export DEBUG=* && npx tsc && node ./dist/app.js",
     "debug": "export DEBUG=* && npm start",
     "test": "npx jest",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "dev": "node --inspect --require source-map-support/register -r ts-node/register app.ts"
   },
   "author": "",
