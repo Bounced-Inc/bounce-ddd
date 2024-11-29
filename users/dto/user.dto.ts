@@ -8,3 +8,11 @@ export interface UserDto {
    lastName?: string;
    permissionLevel: UserRole;
 }
+
+export interface UserDtoPatch {
+   email?: string;
+   password?: string;
+   firstName?: string;
+   lastName?: string;
+   permissionLevel?: UserRole;
+}

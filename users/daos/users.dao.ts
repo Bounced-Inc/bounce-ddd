@@ -1,4 +1,4 @@
-import {UserDto} from "../dto/user.dto";
+import {UserDto, UserDtoPatch} from "../dto/user.dto";
 import shortid from "shortid";
 import debug from 'debug';
 import { UserRole } from "../models/user";
@@ -60,14 +60,9 @@ class UsersDao {
         return `${user.id} updated via put`;
     }
 
-    async patchUserById(userId: string, user: UserDto) {
+    async patchUserById(userId: string, user: UserDtoPatch) {
         console.log(`Attempting to patch user with ID: ${userId}`);
-        console.log('Patch data received:', user);
-
-        if (user.id && user.id !== userId) {
-            console.error(`User ID mismatch - Path param: ${userId}, Body ID: ${user.id}`);
-            throw new Error('User ID mismatch');
-        }
+        console.log('Patch data received:', JSON.stringify(user, null, 2));
 
         console.log('Updating user fields...');
         this.users = this.users.map((existingUser, _index) => {
@@ -75,6 +70,7 @@ class UsersDao {
                 console.log('Found matching user:', existingUser);
                 const updatedUser = {
                     ...existingUser,
+                    email: user.email ?? existingUser.email,
                     password: user.password ?? existingUser.password,
                     firstName: user.firstName ?? existingUser.firstName,
                     lastName: user.lastName ?? existingUser.lastName,
